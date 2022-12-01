@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  edgedb:
+    image: edgedb/edgedb:2.7
+    volumes:
+      # a unique name of the volume on a host machine (/var/lib/docker/volumes/[name]): the path in the container.
+      - edgedb-data:/var/lib/edgedb/data
+      - ./dbschema:/dbschema
+    ports:
+      - "5656:5656"
+    environment:
+        # providing connection information to your EdgeDB client
+      - EDGEDB_INSTANCE=qna_remote
+      - EDGEDB_DATABASE=edgedb
+      - EDGEDB_SERVER_ADMIN_UI=enabled
+        # When EDGEDB_SERVER_SECURITY is set to insecure_dev_mode, then the TLS MODE is generate_self_signed by default.
+      - EDGEDB_SERVER_SECURITY=insecure_dev_mode
+        # when TLS MODE is set to generate_self_signed, then
+        # a new self-signed certificate and private key will be generated and placed in the path specified by DATADIR.
+      - EDGEDB_SERVER_TLS_CERT_MODE=generate_self_signed
+      - EDGEDB_SERVER_DATADIR=edgedb-data
+
+  backend:
+    build: src/
+    command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "8004:8000"
+    depends_on:
+      - edgedb
+
+volumes:
+  edgedb-data:
