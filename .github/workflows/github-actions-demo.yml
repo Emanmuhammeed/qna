@@ -16,3 +16,10 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
+  TFD-EdgeDB:
+    runs-on: ubuntu-latest
+    name: CI with EdgeDB action
+    steps:
+      - uses: actions/checkout@v2
+      - uses: edgedb/setup-edgedb@v1
+      - run: edgedb query "SELECT 'Hello from GitHub Actions'"
