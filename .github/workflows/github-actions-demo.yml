@@ -27,7 +27,9 @@ jobs:
           ports:
             - 5656:5656
     steps:
-        - uses: actions/checkout@v2
+          # this step will run v3 of the actions/checkout action
+        - uses: actions/checkout@v3
+          # this step will run v1 of the edgedb/setup-edgedb action
         - uses: edgedb/setup-edgedb@v1
           with:
             server-dsn: edgedb://localhost:5656
