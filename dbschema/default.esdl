@@ -1,52 +1,43 @@
 module default {
-    abstract type Person {
-        required property name -> str;
-        multi link places_visited -> Place;
-        single link lover -> Person;
-        property is_single := not exists .lover;
-    }
-
-    # player character
-    type PC extending Person {
-        required property transport -> Transport;
-        property age -> HumanAge;
-    }
-
-    # non-player character
-    type NPC extending Person {
-        property age -> HumanAge;
-    }
-
-    type Vampire extending Person {
-        property age -> int16;
-    }
-
-    abstract type Place {
-        required property name -> str;
-        property modern_name -> str;
-        property important_places -> array<str>;
-    }
-
-    type City extending Place;
-
-    type Country extending Place;
-
-    type Time {
-        required property clock -> str {
-            constraint expression on (len(__subject__) = 8)
+    type User {
+        required property first_name -> str;
+        required property last_name -> str;
+        required property username -> str {
+            constraint exclusive;
         }
-        property clock_time := <cal::local_time>.clock;
-        property hour := .clock[0:2];
-        property is_awake := awake.Awake IF (<int16>.hour > 19) And (<int16>.hour < 7) ELSE awake.Asleep;
+        required property age -> Age;
+        multi link posts -> Post;
+
     }
 
-    scalar type Transport extending enum<Feet, Train, HorseDrawnCarriage>;
+    abstract type Post {
+        required property content -> str;
+        property upvote -> {
+            default := 0; 
+        }
+        property downvote -> {
+            default := 0; 
+        }
+        single link author -> Person;
+    }
 
-    scalar type HumanAge extending int16{
+    type Question extending Post {
+        required property title -> str;
+        required property tags -> array<str>;
+        multi link comments -> Comment;
+        multi link answer -> Answer;
+    }
+
+    type Answer extending Post {
+        multi link comments -> Comment;
+    }
+
+    type Comment extending Post {
+
+    }
+
+    scalar type Age extending int16{
         constraint max_value(120);
         constraint min_value(0);
     }
-
-    scalar type awake extending enum<Awake, Asleep>;
-
 }
