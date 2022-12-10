@@ -18,12 +18,12 @@ RUN apt update \
 
 # Install Python Dependencies
 RUN pip install --upgrade pip
-COPY requirements.txt .
+COPY requirements-dev.txt .
 
 # Cache Python Packages to the Docker Host: using the BuildKit: an opt-in image building engine which offers substantial improvements over the traditional process.
 # new caching mechanism that can cache these dependencies download, instead of downloading them each time.
 RUN --mount=type=cache,target=/root/.cache \
-    pip install -r requirements.txt
+    pip install -r requirements-dev.txt
 
 # Add app
 COPY . .
